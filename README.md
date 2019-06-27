@@ -6,10 +6,15 @@ https://kubectl.docs.kubernetes.io/
 
 # Set Auto complete for kubectl
 Setup autocomplete in bash into the current shell, bash-completion package should be installed first.</br>
-source <(kubectl completion bash) </br>
+$ source <(kubectl completion bash) </br>
 
 Add autocomplete permanently to your bash shell.</br>
-echo "source <(kubectl completion bash)" >> ~/.bashrc
+$ echo "source <(kubectl completion bash)" >> ~/.bashrc
 
-# list api-resources
+# list api resources/services
   $ kubectl api-resources </br>
+  $ kubectl get apiservice </br>
+
+  # Cluster info dump
+  To get the whole cluster information </br>
+  $ kubectl cluster-info dump
