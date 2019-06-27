@@ -1,0 +1,94 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2019-06-26T15:30:01Z"
+  generateName: nginx-7cdbd8cdc9-
+  labels:
+    pod-template-hash: 7cdbd8cdc9
+    run: nginx
+  name: nginx-7cdbd8cdc9-tvm2f
+  namespace: default
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: nginx-7cdbd8cdc9
+    uid: 88cf1708-980d-11e9-881b-0a21b420dce0
+  resourceVersion: "38514"
+  selfLink: /api/v1/namespaces/default/pods/nginx-7cdbd8cdc9-tvm2f
+  uid: 43981168-9827-11e9-881b-0a21b420dce0
+spec:
+  containers:
+  - image: nginx
+    imagePullPolicy: Always
+    name: nginx
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-555r9
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: manojchandranster3c.mylabserver.com
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: default-token-555r9
+    secret:
+      defaultMode: 420
+      secretName: default-token-555r9
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2019-06-26T15:30:01Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2019-06-26T15:30:06Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2019-06-26T15:30:06Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2019-06-26T15:30:01Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://3e5bcb3d630ed76db854cec2a9e9abbd33140b7cc51c1824a347160f6735dbaf
+    image: nginx:latest
+    imageID: docker-pullable://nginx@sha256:bdbf36b7f1f77ffe7bd2a32e59235dff6ecf131e3b6b5b96061c652f30685f3a
+    lastState: {}
+    name: nginx
+    ready: true
+    restartCount: 0
+    state:
+      running:
+        startedAt: "2019-06-26T15:30:05Z"
+  hostIP: 172.31.27.138
+  phase: Running
+  podIP: 10.244.2.4
+  qosClass: BestEffort
+  startTime: "2019-06-26T15:30:01Z"
