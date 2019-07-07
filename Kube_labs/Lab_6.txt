@@ -1,0 +1,109 @@
+Learning Objectives : Installing and Testing the Components of a Kubernetes Cluster
+check_circle
+============================================================================================================
+Get the Docker gpg, and add it to your repository.
+keyboard_arrow_up
+Run the following commands to get the Docker gpg key and add it to your repository:
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+check_circle
+============================================================================================================
+Get the Kubernetes gpg key, and add it to your repository.
+keyboard_arrow_up
+Run the following commands to get the Kubernetes gpg key and add it to your repository:
+
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+cat << EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+sudo apt-get update
+=============================================================================================================
+check_circle
+Install Docker, kubelet, kubeadm, and kubectl.
+keyboard_arrow_up
+Run the following command to install Docker, kubelet, kubeadm, and kubectl:
+
+sudo apt-get install -y docker-ce=18.06.1~ce~3-0~ubuntu kubelet=1.13.5-00 kubeadm=1.13.5-00 kubectl=1.13.5-00 --allow-change-held-packages
+==============================================================================================================
+check_circle
+Initialize the Kubernetes cluster.
+keyboard_arrow_up
+Run the following command to initialize the cluster using kubeadm:
+
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+check_circle
+Set up local kubeconfig.
+keyboard_arrow_up
+Run the following command to set up local kubeconfig:
+
+mkdir -p $HOME/.kube
+
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+=============================================================================================================
+kubeadm join 10.0.1.154:6443 --token 7knfcz.emffvs0mo9ioqsrr --discovery-token-ca-cert-hash sha256:e46cb1e61680da626c575b995cdf2be844e0595c5c8481685e77edace12c86fb
+=============================================================================================================
+check_circle
+Apply the flannel CNI plugin as a network overlay.
+keyboard_arrow_up
+Run the following command to apply flannel:
+
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/bc79dd1505b0c8681ece4de4c0d86c5cd2643275/Documentation/kube-flannel.yml
+=============================================================================================================
+check_circle
+Join the worker nodes to the cluster, and verify they have joined successfully.
+keyboard_arrow_up
+Run the following command to join the worker nodes to the cluster:
+
+sudo kubeadm create token --print-join-command <your unique string from the output of kubeadm init>
+=============================================================================================================
+check_circle
+Run a deployment that includes at least one pod, and verify it was successful.
+keyboard_arrow_up
+Run the following commands to run a deployment of ngnix and verify:
+
+kubectl create deployment nginx --image=nginx
+
+kubectl get deployments
+=============================================================================================================
+check_circle
+Verify the pod is running and available.
+keyboard_arrow_up
+Run the following command to verify the pod is up and running:
+
+kubectl get pods
+=============================================================================================================
+check_circle
+Use port forwarding to extend port 80 to 8081, and verify access to the pod directly.
+keyboard_arrow_up
+Run the following command to forward the container port 80 to 8081:
+
+kubectl port-forward [pod_name] 8081:80
+Open a new shell to the Kubernetes master and run the following command:
+
+curl --head http://127.0.0.1:8081
+NOTE: You must leave the previous session open in order to properly port forward. As soon as you close that session, the port will NO LONGER be open.
+==============================================================================================================
+check_circle
+Execute a command directly on a pod.
+keyboard_arrow_up
+Run this command to execute the nginx version command from a pod:
+
+kubectl exec -it <pod_name> -- nginx -v
+==============================================================================================================
+check_circle
+Create a service, and verify connectivity on the node port.
+keyboard_arrow_up
+Run these commands to create a NodePort service and verify the connectivity:
+
+kubectl expose deployment nginx --port 80 --type NodePort
+
+kubectl get services
+
+curl -I localhost:$node_port
+

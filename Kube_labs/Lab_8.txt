@@ -1,0 +1,113 @@
+Learning Objectives : Creating Persistent Storage for Pods in Kubernetes
+=================================================================================
+Pods in Kubernetes are ephemeral, which makes the local container filesytem unusable, as we can never ensure the pod will remain. To decouple your storage from your pods, we will be creating a persistent volume to mount for use by your pods. we will be deploying a mongodb image that will contain a MongoDB database. we will first create the persistent volume, then create the pod YAML for deploying the pod to mount the volume. we will then delete the pod and create a new pod, which will access that same volume.
+=================================================================================
+Create a PersistentVolume.
+keyboard_arrow_up
+Use the following YAML spec for the PersistentVolume named mongodb-pv.yaml:
+
+cat <<EOF > ./mongodb-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: mongodb-pv
+spec:
+   storageClassName: local-storage
+   capacity:
+     storage: 1Gi
+   accessModes:
+     - ReadWriteOnce
+   hostPath:
+     path: "/mnt/data"
+EOF
+
+Then, create the PersistentVolume:
+
+ kubectl apply -f mongodb-pv.yaml
+=================================================================================
+Create a PersistentVolumeClaim.
+keyboard_arrow_up
+Use the following YAML spec for the PersistentVolumeClaim named mongodb-pvc.yaml:
+
+cat <<EOF > ./mongodb-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+   name: mongodb-pvc
+spec:
+   storageClassName: local-storage
+   accessModes:
+     - ReadWriteOnce
+   resources:
+     requests:
+       storage: 1Gi
+EOF
+Then, create the PersistentVolumeClaim:
+
+ kubectl apply -f mongodb-pvc.yaml
+=================================================================================
+Create a pod from the mongodb image, with a mounted volume to mount path `/data/db`.
+keyboard_arrow_up
+Use the following YAML spec for the pod named mongodb-pod.yaml:
+
+cat <<EOF > ./mongodb-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+   name: mongodb 
+spec:
+   containers:
+   - image: mongo
+     name: mongodb
+     volumeMounts:
+     - name: mongodb-data
+       mountPath: /data/db
+     ports:
+     - containerPort: 27017
+       protocol: TCP
+   volumes:
+   - name: mongodb-data
+     persistentVolumeClaim:
+       claimName: mongodb-pvc
+EOF
+
+Then, create the pod:
+
+kubectl apply -f mongodb-pod.yaml
+
+Verify the pod was created:
+
+kubectl get pods
+=================================================================================
+Access the node and view the data within the volume.
+keyboard_arrow_up
+Connect to the node:
+
+ssh <node_hostname>
+Switch to the /mnt/data directory:
+
+cd /mnt/data
+List the contents of the directory:
+
+ls
+=================================================================================
+Delete the pod and create a new pod with the same YAML spec.
+keyboard_arrow_up
+Delete the pod:
+
+ kubectl delete pod mongodb
+Create a new pod:
+
+ kubectl apply -f mongodb-pod.yaml
+=================================================================================
+Verify the data still resides on the volume.
+keyboard_arrow_up
+Log in to the node:
+
+ ssh <node_hostname>
+Switch to the /mnt/data directory:
+
+ cd /mnt/data
+List the contents of the directory:
+
+ ls 

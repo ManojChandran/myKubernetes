@@ -1,0 +1,60 @@
+Learning Objectives : Creating a Service and Discovering DNS Names in Kubernetes
+====================================================================================
+check_circle
+Create an nginx deployment, and verify it was successful.
+keyboard_arrow_up
+Use this command to create an nginx deployment:
+
+kubectl run nginx --image=nginx
+=====================================================================================
+Use this command to verify deployment was successful:
+
+kubectl get deployments
+check_circle
+Create a service, and verify the service was successful.
+keyboard_arrow_up
+Use this command to create a service:
+
+kubectl expose deployment nginx --port 80 --type NodePort
+Use this command to verify the service was created:
+
+kubectl get services
+=====================================================================================
+check_circle
+Create a pod that will allow you to query DNS, and verify it’s been created.
+keyboard_arrow_up
+Use the following YAML to create the busybox pod spec:
+
+cat <<EOF > ./busybox.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+spec:
+  containers:
+  - image: busybox:1.28.4
+    command:
+      - sleep
+      - "3600"
+    name: busybox
+  restartPolicy: Always
+EOF
+Use the following command to create the busybox pod:
+
+kubectl create -f busybox.yaml
+=====================================================================================
+Use the following command to verify the pod was created successfully:
+
+kubectl get pods
+check_circle
+Perform a DNS query to the service.
+keyboard_arrow_up
+Use the following command to query the DNS name of the nginx service:
+
+kubectl exec busybox -- nslookup nginx
+check_circle
+Record the DNS name.
+keyboard_arrow_up
+Record the name of:
+
+<service-name>;.default.svc.cluster.local

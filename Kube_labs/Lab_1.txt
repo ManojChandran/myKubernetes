@@ -1,0 +1,51 @@
+Learning Objectives : Exploring the Kubernetes Cluster via the Command Line
+check_circle
+==========================================================================
+List all the nodes in the cluster.
+keyboard_arrow_up
+Use the following command to list the nodes in your cluster:
+
+kubectl get nodes
+==========================================================================
+check_circle
+List all the pods in all namespaces.
+keyboard_arrow_up
+Use the following command to list the pods in all namespaces:
+
+kubectl get pods --all-namespaces
+==========================================================================
+check_circle
+List all the namespaces in the cluster.
+keyboard_arrow_up
+Use the following command to list all the namespaces in the cluster:
+
+kubectl get namespaces
+==========================================================================
+check_circle
+Check to see if there are any pods running in the default namespace.
+keyboard_arrow_up
+Use the following command to list the pods in the default namespace:
+
+kubectl get pods
+==========================================================================
+check_circle
+Find the IP address of the API server running on the master node.
+keyboard_arrow_up
+Use the following command to find the IP address of the API server:
+
+kubectl get pods --all-namespaces -o wide
+==========================================================================
+check_circle
+See if there are any deployments in this cluster.
+keyboard_arrow_up
+Use the following command to check for any deployments in the cluster:
+
+kubectl get deployments --all-namespaces
+==========================================================================
+check_circle
+Find the label applied to the etcd pod on the master node.
+keyboard_arrow_up
+Use the following command to view the label on the etcd pod:
+
+kubectl get pods --all-namespaces --show-labels -o wide
+==========================================================================

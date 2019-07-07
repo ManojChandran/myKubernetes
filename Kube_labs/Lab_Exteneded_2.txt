@@ -1,0 +1,161 @@
+Lab Extended 1 : Network Policy with Calico
+
+Learning Objectives
+check_circle
+Create the Kubernetes Cluster
+keyboard_arrow_up
+The k8s-create.sh script should be in the cloud_user's home directory. You may list the directory contents with:
+
+$ ls -l
+To run the script, enter the following command:
+
+Note: Be sure to have a space between the . and the ./ in front of the script. This ensures that environment variables set in the script are then available to the parent shell.
+
+$ . ./k8s-create.sh
+Once the cluster configuration has been created, you can apply the configuration with this command:
+
+$ kops update cluster -y
+Note: To view the cluster servers as they are being created, you may use the aws console and credentials provided.
+
+You may validate the cluster with the command:
+
+$ kops validate cluster
+It will give errors until the cluster is fully configured.
+
+When complete, it should report that the cluster is ready.
+
+Verify the cluster is running with:
+
+$ kubectl get nodes
+check_circle
+Configure the Required Namespace
+keyboard_arrow_up
+To configure a namespace for our lab, you may create a namespace called 'policy-demo' by entering:
+
+$ kubectl create ns policy-demo
+The command should respond with an affirmation that the namespace was created.
+
+check_circle
+Create the Demo Pods
+keyboard_arrow_up
+Run two replicas of the nginx service:
+
+$ kubectl run --namespace=policy-demo nginx --replicas=2 --image=nginx
+Expose the service on port 80:
+
+$ kubectl expose --namespace=policy-demo deployment nginx --port=80
+Run an interactice session in a pod called access using the busybox image:
+
+$ kubectl run --namespace=policy-demo access --rm -ti --image busybox /bin/sh
+Once inside the image, type this command to verify access to the nginx server:
+
+/ # wget -q nginx -O -
+This should respond with the raw html from nginx.
+
+To exit the interactive container session:
+
+/ # exit
+
+check_circle
+Enable Isolation
+keyboard_arrow_up
+To download the yaml file:
+
+$ wget https://raw.github.com/linuxacademy/content-kubernetes-security-ac/master/default-deny.yaml
+
+default-deny.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: default-deny
+  namespace: policy-demo
+spec:
+  podSelector:
+    matchLabels: {}
+
+To view the yaml file:
+
+$ more default-deny.yaml
+To create the policy:
+
+$ kubectl create -f default-deny.yaml
+check_circle
+Test Isolation
+keyboard_arrow_up
+To view that the nginx pods are running:
+
+$ kubectl --namespace=policy-demo get pods
+To run an interactive container to test access:
+
+$ kubectl run --namespace=policy-demo access --rm -ti --image busybox /bin/sh
+Within the access container, enter:
+
+/ # wget -q --timeout=5 nginx -O -
+Note: you should receive a timeout in 5 seconds
+
+To exit the container shell:
+
+/ # exit
+check_circle
+Allow Restricted Access Using a Network Policy
+keyboard_arrow_up
+To download the yaml file:
+
+$ wget https://raw.github.com/linuxacademy/content-kubernetes-security-ac/master/access-nginx.yaml
+To look at the file:
+
+access-nginx.yaml 
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: access-nginx
+  namespace: policy-demo
+spec:
+  podSelector:
+    matchLabels:
+      run: nginx
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            run: access
+
+
+$ more access-nginx.yaml
+To create the policy:
+
+$ kubectl create -f access-nginx.yaml
+check_circle
+Verify access to nginx from a pod called access
+keyboard_arrow_up
+Run an interactive pod called access with an interactive shell:
+
+$ kubectl run --namespace=policy-demo access --rm -ti --image busybox /bin/sh
+Once inside the container session, test nginx access:
+
+/ # wget -q --timeout=5 nginx -O -
+Note: Since we are in a pod named 'access' we should be able to access the nginx service
+
+To exit the container shell:
+
+/ # exit
+check_circle
+Verify that access to nginx is not allowed from another pod
+keyboard_arrow_up
+Run a container shell in a pod called 'not-access':
+
+$ kubectl run --namespace=policy-demo not-access --rm -ti --image busybox /bin/sh
+Within the container attempt to access nginx:
+
+/ # wget -q --timeout=5 nginx -O -
+Note: this command should timeout after 5 seconds.
+
+To exit the container shell:
+
+/ # exit
+check_circle
+Delete the namespace to cleanup
+keyboard_arrow_up
+To delete the namespace and thus terminate the running pods and nullify the network policies created, enter:
+
+$ kubectl delete ns policy-demo
