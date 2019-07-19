@@ -28,6 +28,7 @@ sudo apt-mark hold kubelet kubeadm kubectl
 ====================================================================================
 check_circle
 Bootstrap the cluster on the Kube master node.
+-----------------------------------------------
 keyboard_arrow_up
 On the Kube master node, do this:
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16
@@ -44,7 +45,7 @@ Run the following commmand on the Kube master node to verify it is up and runnin
 kubectl version
 This command should return both a Client Version and a Server Version.
 ====================================================================================
-kubeadm join 10.0.1.101:6443 --token 9a277r.ql1fs37omgj04rgf --discovery-token-ca-cert-hash sha256:2020449392748972797e9cd8f89c6c5fbe7d21f9ee007185912cf413c9c72f66
+kubeadm join 172.31.40.211:6443 --token oz3u6e.8bfv0qa1zrn7j8f0 --discovery-token-ca-cert-hash sha256:9d9d14c9a805e5ea963281d8876034763599ffe4a018167a044c670fa2e2935d
 ====================================================================================
 check_circle
 Join the two Kube worker nodes to the cluster.

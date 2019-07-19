@@ -1,0 +1,42 @@
+Learning Objectives
+===================================================================================
+Identify the broken object and save its name and summary data
+
+Become the root user so that we can write to the file:
+
+sudo -i
+Describe the broken service:
+
+kubectl describe service oauth-provider -n gem
+Note that the service's selector selects pods with the label role: oauth.
+
+Get a list of pods with labels in order to locate the pod(s) selected by the service:
+
+kubectl get pods --all-namespaces --show-labels
+Note that the pod called bowline has the role: oauth label.
+
+Save the name of the broken pod:
+
+vi /usr/ckad/broken-object-name.txt
+Put the word bowline in there.
+
+Save the JSON summary data for the broken pod to the specified file:
+
+kubectl get pod bowline -n gem -o json > /usr/ckad/broken-object.json
+===================================================================================
+Fix the problem
+
+Examine the broken pod more closely:
+
+kubectl describe pod bowline -n gem
+Based on the event log and pod status, it appears something may be wrong with the pod image. Look at the pod's container image, which appears to be misspelled. Edit the pod:
+
+kubectl edit pod bowline -n gem
+Fix the image name by changing it to nginx:1.15.9.
+
+Verify that the pod is now working:
+
+kubectl get pod bowline -n gem
+Test the broken service to make sure it is working:
+
+curl localhost:30080

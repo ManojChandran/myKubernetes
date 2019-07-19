@@ -15,6 +15,7 @@ spec:
       labels:
         app: cassandra
     spec:
+      schedulerName: stork
       terminationGracePeriodSeconds: 1800
       containers:
       - name: cassandra
@@ -36,14 +37,14 @@ spec:
           requests:
             cpu: "500m"
             memory: 1Gi
-        securityContext:
-          capabilities:
-            add:
-              - IPC_LOCK
+#        securityContext:
+#          capabilities:
+#            add:
+#              - IPC_LOCK
         lifecycle:
           preStop:
             exec:
-              command: 
+              command:
               - /bin/sh
               - -c
               - nodetool drain
@@ -55,15 +56,19 @@ spec:
           - name: CASSANDRA_SEEDS
             value: "cassandra-0.cassandra.default.svc.cluster.local"
           - name: CASSANDRA_CLUSTER_NAME
-            value: "K8Demo"
+            value: "Cassandra"
           - name: CASSANDRA_DC
-            value: "DC1-K8Demo"
+            value: "DC1"
           - name: CASSANDRA_RACK
-            value: "Rack1-K8Demo"
-          - name: POD_IP
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
+            value: "Rack1"
+          - name: CASSANDRA_AUTO_BOOTSTRAP
+            value: "false"
+          - name: CASSANDRA_ENDPOINT_SNITCH
+            value: GossipingPropertyFileSnitch
+#          - name: POD_IP
+#            valueFrom:
+#              fieldRef:
+#                fieldPath: status.podIP
         readinessProbe:
           exec:
             command:
@@ -77,24 +82,20 @@ spec:
         # the stateful pod volumes.
         volumeMounts:
         - name: cassandra-data
-          mountPath: /cassandra_data
+          mountPath: /var/lib/cassandra
   # These are converted to volume claims by the controller
   # and mounted at the paths mentioned above.
   # do not use these in production until ssd GCEPersistentDisk or other ssd pd
   volumeClaimTemplates:
   - metadata:
       name: cassandra-data
+      annotations:
+        volume.beta.kubernetes.io/storage-class: px-storageclass
+        labels:
+          app: cassandra
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: fast
       resources:
         requests:
-          storage: 1Gi
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: fast
-provisioner: k8s.io/minikube-hostpath
-parameters:
-  type: pd-ssd
+          storage: 5Gi
