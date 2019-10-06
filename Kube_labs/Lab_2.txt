@@ -1,9 +1,8 @@
 ====================================================================================
 Learning Objectives : Building a Kubernetes Cluster with Kubeadm
-check_circle
 ====================================================================================
 Install Docker on all three nodes.
-keyboard_arrow_up
+
 Do the following on all three nodes:
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
@@ -14,9 +13,9 @@ Verify that Docker is up and running with:
 sudo systemctl status docker
 Make sure the Docker service status is active (running)!
 ====================================================================================
-check_circle
+
 Install Kubeadm, Kubelet, and Kubectl on all three nodes.
-keyboard_arrow_up
+
 Install the Kubernetes components by running this on all three nodes:
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 cat << EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
@@ -26,10 +25,10 @@ sudo apt-get update
 sudo apt-get install -y kubelet=1.12.7-00 kubeadm=1.12.7-00 kubectl=1.12.7-00
 sudo apt-mark hold kubelet kubeadm kubectl
 ====================================================================================
-check_circle
+
 Bootstrap the cluster on the Kube master node.
 -----------------------------------------------
-keyboard_arrow_up
+
 On the Kube master node, do this:
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 That command may take a few minutes to complete.
@@ -47,9 +46,9 @@ This command should return both a Client Version and a Server Version.
 ====================================================================================
 kubeadm join 172.31.40.211:6443 --token oz3u6e.8bfv0qa1zrn7j8f0 --discovery-token-ca-cert-hash sha256:9d9d14c9a805e5ea963281d8876034763599ffe4a018167a044c670fa2e2935d
 ====================================================================================
-check_circle
+
 Join the two Kube worker nodes to the cluster.
-keyboard_arrow_up
+
 Copy the kubeadm join command that was printed by the kubeadm init command earlier, with the token and hash. Run this command on both worker nodes, but make sure you add sudo in front of it:
 sudo kubeadm join $some_ip:6443 --token $some_token --discovery-token-ca-cert-hash $some_hash
 Now, on the Kube master node, make sure your nodes joined the cluster successfully:
@@ -61,9 +60,9 @@ ip-10-0-1-102   NotReady   <none>   8s    v1.12.2
 ip-10-0-1-103   NotReady   <none>   5s    v1.12.2
 Note that the nodes are expected to be in the NotReady state for now.
 ====================================================================================
-check_circle
+
 Set up cluster networking with flannel.
-keyboard_arrow_up
+
 Turn on iptables bridge calls on all three nodes:
 echo "net.bridge.bridge-nf-call-iptables=1" | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p

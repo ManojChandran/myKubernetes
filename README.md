@@ -18,3 +18,5 @@ $ echo "source <(kubectl completion bash)" >> ~/.bashrc
   # Cluster info dump
   To get the whole cluster information </br>
   $ kubectl cluster-info dump
+
+![picture alt](https://www.cncf.io/wp-content/uploads/2018/03/CNCF_TrailMap_latest.png "CNCF_Trail MAP")

@@ -1,0 +1,33 @@
+Learning Objectives : Configuring CronJobs in Kubernetes
+=================================================================================
+Create the cron job in the cluster
+
+Create a descriptor for the cron job with vi ~/cleanup-cronjob.yml.
+
+cat <<EOF > ./cleanup-cronjob.yml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cleanup-cronjob
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: data-cleanup
+            image: linuxacademycontent/data-cleanup:1
+          restartPolicy: OnFailure
+EOF
+
+Create the cron job in the cluster.
+
+kubectl apply -f ~/cleanup-cronjob.yml
+=================================================================================
+Allow the cron job to run successfully
+
+Give the cron job a minute or so to run once, and then check the status.
+
+kubectl get cronjob cleanup-cronjob
+You should see a timestamp under LAST-SCHEDULE, indicating the job was executed.
